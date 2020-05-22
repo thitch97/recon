@@ -26,7 +26,7 @@ func TestVet(t *testing.T) {
 	var Expect = NewWithT(t).Expect
 
 	var err error
-	entrypoint, err := gexec.Build("github.com/thitch97/vet")
+	entrypoint, err = gexec.Build("github.com/thitch97/vet")
 	Expect(err).NotTo(HaveOccurred())
 
 	spec.Run(t, "vet", func(t *testing.T, context spec.G, it spec.S) {

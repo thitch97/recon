@@ -63,11 +63,11 @@ func main() {
 
 	bodyWriter.Close()
 
-	uploadReq, err := http.NewRequest("POST", fmt.Sprintf("%s/files", config.Endpoint), bodyBuf)
+	uploadReq, _ := http.NewRequest("POST", fmt.Sprintf("%s/files", config.Endpoint), bodyBuf)
 
 	uploadReq.Header.Set("Content-Type", bodyWriter.FormDataContentType())
 
-	uploadReq.Header.Set("x-apikey", fmt.Sprintf("%s", config.ApiKey))
+	uploadReq.Header.Set("x-apikey", config.ApiKey)
 
 	resp, err := http.DefaultClient.Do(uploadReq)
 	if err != nil {
@@ -88,11 +88,17 @@ func main() {
 	}
 
 	decoder := json.NewDecoder(resp.Body)
-	decoder.Decode(&uploadRespObj)
+	err = decoder.Decode(&uploadRespObj)
+	if err != nil {
+		panic(err)
+	}
 
 	analysisReq, err := http.NewRequest("GET", fmt.Sprintf("%s/analyses/%s", config.Endpoint, uploadRespObj.Data.ID), nil)
+	if err != nil {
+		panic(err)
+	}
 
-	analysisReq.Header.Set("x-apikey", fmt.Sprintf("%s", config.ApiKey))
+	analysisReq.Header.Set("x-apikey", config.ApiKey)
 
 	analysisResp, err := http.DefaultClient.Do(analysisReq)
 	if err != nil {
@@ -128,7 +134,10 @@ func main() {
 	}
 
 	analysisDecoder := json.NewDecoder(analysisResp.Body)
-	analysisDecoder.Decode(&analysisRespObj)
+	err = analysisDecoder.Decode(&analysisRespObj)
+	if err != nil {
+		panic(err)
+	}
 
 	fmt.Printf("Analysis ID: %s\n", uploadRespObj.Data.ID)
 	fmt.Printf("Status: %s\n", analysisRespObj.Data.Attributes.Status)
